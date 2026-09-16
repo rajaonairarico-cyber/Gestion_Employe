@@ -1,12 +1,20 @@
-FROM php:8.2-cli
+FROM php:8.2-apache
 
+# Activer mod_rewrite
+RUN a2enmod rewrite
+
+# Installer les extensions PDO (PostgreSQL + MySQL)
 RUN apt-get update && apt-get install -y libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql \
+    && docker-php-ext-install pdo pdo_pgsql pdo_mysql \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /app
-WORKDIR /app
+# Copier tout le backend
+COPY . /var/www/html/
 
-EXPOSE 8080
+# Autoriser .htaccess
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-10000} -t /app"]
+EXPOSE 80
+
+# Au démarrage : adapter le port puis lancer Apache
+CMD ["sh", "-c", "sed -i \"s/Listen 80/Listen ${PORT:-80}/\" /etc/apache2/ports.conf && sed -i \"s/:80/:${PORT:-80}/\" /etc/apache2/sites-available/000-default.conf && apache2-foreground"]
