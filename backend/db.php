@@ -14,7 +14,7 @@ try {
     if ($driver === 'pgsql') {
         $port = getenv('DB_PORT') ?: '5432';
         $conn = new PDO(
-            "pgsql:host=$host;port=$port;dbname=$db_name",
+            "pgsql:host=$host;port=$port;dbname=$db_name;sslmode=require",
             $username,
             $password
         );
@@ -32,7 +32,7 @@ try {
     if ($driver === 'pgsql') {
         $conn->exec('CREATE TABLE IF NOT EXISTS employe (
             id SERIAL PRIMARY KEY,
-            "numEmp" VARCHAR(20) NOT NULL,
+            numEmp VARCHAR(20) NOT NULL,
             nom VARCHAR(255) NOT NULL,
             emploi VARCHAR(100),
             nb_jours INT NOT NULL,
@@ -59,7 +59,10 @@ try {
 } catch (PDOException $e) {
     http_response_code(500);
     header('Content-Type: application/json');
-    echo json_encode(["message" => "Erreur de connexion à la base de données"]);
+    echo json_encode([
+        "message" => "Erreur de connexion à la base de données",
+        "detail"  => $e->getMessage()
+    ]);
     exit;
 }
 ?>

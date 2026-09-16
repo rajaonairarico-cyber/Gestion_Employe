@@ -18,7 +18,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     region: frankfurt
-    healthCheckPath: /test.php
+    healthCheckPath: /
     envVars:
       - key: DB_DRIVER
         value: pgsql
@@ -52,4 +52,4 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VUE_APP_API_URL
-        value: https://gestion-employe-api.onrender.com
+        value: https://gestion-employe-api-6mhx.onrender.com
