@@ -1,6 +1,6 @@
 # ═══════════════════════════════════════════════════════════
-#  Gestion_Employe — Blueprint Render (déploiement en un clic)
-#  Rend déployé : Static Site (frontend) + Web Service Docker (API) + PostgreSQL
+#  Gestion_Employe — Blueprint Render
+#  Frontend Vue (Static) + API PHP (Docker) + PostgreSQL
 # ═══════════════════════════════════════════════════════════
 
 databases:
@@ -14,9 +14,10 @@ services:
   - type: web
     name: gestion-employe-api
     runtime: docker
-    rootDir: ./backend
+    rootDir: backend
     dockerfilePath: ./Dockerfile
     plan: free
+    region: frankfurt
     healthCheckPath: /test.php
     envVars:
       - key: DB_DRIVER
@@ -43,11 +44,14 @@ services:
           property: password
 
   # ── 2. Frontend Vue (Static Site) ─────────────────────────
-  - type: static
+  - type: web                      # ← "web" (et non "static")
     name: gestion-employe-frontend
-    runtime: static
-    buildCommand: cd frontend/Gestion-Employe && npm install && npm run build
-    staticPublishPath: ./frontend/Gestion-Employe/dist
+    runtime: static                # ← runtime "static"
+    plan: free
+    region: frankfurt
+    rootDir: frontend/Gestion-Employe
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
     envVars:
       - key: VUE_APP_API_URL
         value: https://gestion-employe-api.onrender.com
