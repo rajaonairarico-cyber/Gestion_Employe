@@ -26,8 +26,10 @@
     <div class="card border-0 shadow-lg rounded-5 overflow-hidden animate__animated animate__fadeInUp">
 
       <!-- En-tête -->
-      <div class="card-header bg-gradient-primary-to-secondary text-white border-0 py-4">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="list-header">
+        <div class="header-blob blob-1"></div>
+        <div class="header-blob blob-2"></div>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative">
           <div class="d-flex align-items-center">
             <div class="icon-circle me-3">
               <i class="bi" :class="isArchived ? 'bi-archive-fill' : 'bi-people-fill'"></i>
@@ -37,6 +39,27 @@
               <p class="mb-0 opacity-75 small">{{ filteredEmployes.length }} employé(s)</p>
             </div>
           </div>
+
+          <!-- Mini-statistiques -->
+          <div v-if="!isArchived" class="d-flex gap-2 flex-wrap">
+            <div class="mini-stat mini-stat-total">
+              <i class="bi bi-people-fill"></i>
+              <span><strong>{{ employes.length }}</strong> total</span>
+            </div>
+            <div class="mini-stat mini-stat-payes">
+              <i class="bi bi-check-circle-fill"></i>
+              <span><strong>{{ payesCount }}</strong> payés</span>
+            </div>
+            <div class="mini-stat mini-stat-attente">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span><strong>{{ aPayerCount }}</strong> à payer</span>
+            </div>
+            <div class="mini-stat mini-stat-cours">
+              <i class="bi bi-clock-fill"></i>
+              <span><strong>{{ enCoursCount }}</strong> en cours</span>
+            </div>
+          </div>
+
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-sm rounded-3 px-3"
               :class="!isArchived ? 'btn-light text-primary fw-bold' : 'btn-outline-light'"
@@ -53,7 +76,7 @@
       </div>
 
       <!-- Corps -->
-      <div class="card-body p-4 p-lg-5">
+      <div class="card-body p-4">
 
         <!-- Barre de recherche -->
         <div class="row mb-4">
@@ -82,17 +105,17 @@
 
         <!-- Tableau -->
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
+          <table class="table table-hover table-striped align-middle mb-0">
+            <thead>
               <tr>
                 <th class="ps-3">N°</th>
-                <th class="ps-3">Nom</th>
-                <th class="text-center">Emploi</th>
-                <th class="text-center">Contrat</th>
-                <th class="text-center">Jours réels</th>
-                <th class="text-center">Taux</th>
-                <th class="text-center">Salaire</th>
-                <th class="text-center">Fin</th>
+                <th>Employé</th>
+                <th>Emploi</th>
+                <th class="text-center">Progression</th>
+                <th class="text-end">Taux</th>
+                <th class="text-end">Salaire</th>
+                <th>Début</th>
+                <th>Fin</th>
                 <th class="text-center">Statut</th>
                 <th class="text-end pe-3">Actions</th>
               </tr>
@@ -102,68 +125,57 @@
                 v-for="emp in filteredEmployes"
                 :key="emp.id"
                 class="animate__animated animate__fadeIn"
-                :class="rowClass(emp)"
               >
                 <td class="ps-3">
-                  <span class="badge bg-dark rounded-pill">{{ emp.numEmp }}</span>
+                  <span class="emp-num">{{ emp.numEmp }}</span>
                 </td>
-                <td class="ps-3">
+                <td>
                   <div class="d-flex align-items-center">
-                    <div class="avatar-circle"
-                      :class="isArchived ? 'bg-danger-10 text-danger' : 'bg-primary-10 text-primary'">
-                      <i class="bi bi-person-fill"></i>
+                    <div class="avatar-circle">
+                      {{ initials(emp.nom) }}
                     </div>
                     <div class="ms-2">
-                      <span class="fw-semibold d-block">{{ emp.nom }}</span>
-                      <span v-if="!isArchived" class="badge badge-suivi" :class="suiviBadgeClass(emp)">
-                        {{ suiviLabel(emp) }}
-                      </span>
+                      <span class="fw-semibold">{{ emp.nom }}</span>
                     </div>
                   </div>
                 </td>
-                <td class="text-center">
-                  <span class="badge bg-info text-dark">{{ emp.emploi }}</span>
+                <td>
+                  <span class="text-body-secondary">{{ emp.emploi }}</span>
                 </td>
-                <td class="text-center">
-                  <span class="badge bg-secondary rounded-pill">{{ emp.nb_jours }}j</span>
-                </td>
-                <td class="text-center">
-                  <span class="badge rounded-pill"
-                    :class="joursReels(emp) >= emp.nb_jours ? 'bg-success' : 'bg-warning text-dark'">
-                    {{ joursReels(emp) }}j / {{ emp.nb_jours }}j
-                  </span>
-                  <div class="progress mt-1" style="height:4px; min-width:70px;">
+                <td class="text-center" style="min-width: 150px;">
+                  <div class="progress progress-slim" title="Avancement du contrat">
                     <div class="progress-bar"
-                      :class="joursReels(emp) >= emp.nb_jours ? 'bg-success' : 'bg-warning'"
+                      :class="joursReels(emp) >= emp.nb_jours ? 'bg-success' : 'progress-bar-brand'"
                       :style="{ width: Math.min(100, (joursReels(emp)/emp.nb_jours)*100) + '%' }">
                     </div>
                   </div>
+                  <small class="text-muted d-block mt-1">{{ joursReels(emp) }}j / {{ emp.nb_jours }}j</small>
                 </td>
-                <td class="text-center">{{ emp.taux_journalier }} Ar</td>
-                <td class="text-center">
-                  <span class="badge bg-success rounded-pill px-3">
-                    {{ (emp.nb_jours * emp.taux_journalier).toFixed(2) }} Ar
-                  </span>
+                <td class="text-end">
+                  <span class="text-body-secondary">{{ formatMontant(emp.taux_journalier) }} Ar</span>
                 </td>
-                <td class="text-center">
+                <td class="text-end">
+                  <strong class="salaire-text">{{ formatMontant(emp.nb_jours * emp.taux_journalier) }} Ar</strong>
+                </td>
+                <td>
                   <small class="text-muted">
-                    <i class="bi bi-calendar me-1"></i>{{ formatDate(emp.date_fin_contrat) }}
+                    <i class="bi bi-calendar-plus me-1"></i>{{ formatDateDay(emp.date_ajout) }}
+                  </small>
+                </td>
+                <td>
+                  <small class="text-muted">
+                    <i class="bi bi-calendar-check me-1"></i>{{ formatDateDay(emp.date_fin_contrat) }}
                   </small>
                 </td>
                 <td class="text-center">
-                  <span v-if="emp.statut_paiement === 'Payé'" class="badge bg-success">
-                    <i class="bi bi-check-circle me-1"></i>Payé
-                  </span>
-                  <span v-else-if="peutEtrePaye(emp)" class="badge bg-danger animate__animated animate__pulse animate__infinite">
-                    <i class="bi bi-exclamation-circle me-1"></i>À payer
-                  </span>
-                  <span v-else class="badge bg-warning text-dark">
-                    <i class="bi bi-clock me-1"></i>En cours
+                  <span class="statut-pill" :class="statutKey(emp)">
+                    <i class="bi" :class="statutIcon(emp)"></i>
+                    {{ statutLabel(emp) }}
                   </span>
                 </td>
                 <td class="text-end pe-3">
                   <template v-if="!isArchived">
-                    <div class="d-flex justify-content-end gap-1">
+                    <div class="d-flex justify-content-end gap-2">
                       <button
                         v-if="emp.statut_paiement !== 'Payé' && peutEtrePaye(emp)"
                         @click="payEmployee(emp)"
@@ -172,12 +184,12 @@
                         <i class="bi bi-cash-coin me-1"></i>Payer
                       </button>
                       <button @click="editEmployee(emp)"
-                        class="btn btn-sm btn-outline-primary rounded-3"
+                        class="btn btn-sm btn-icon btn-neutral rounded-3"
                         title="Modifier">
                         <i class="bi bi-pencil-square"></i>
                       </button>
                       <button @click="openArchiveModal(emp.id, emp.nom)"
-                        class="btn btn-sm btn-outline-warning rounded-3"
+                        class="btn btn-sm btn-icon btn-neutral rounded-3"
                         title="Archiver">
                         <i class="bi bi-archive"></i>
                       </button>
@@ -185,11 +197,11 @@
                   </template>
                   <template v-else>
                     <button @click="restoreEmployee(emp.id)"
-                      class="btn btn-sm btn-outline-success rounded-3 me-1" title="Restaurer">
+                      class="btn btn-sm btn-icon btn-outline-success rounded-3 me-1" title="Restaurer">
                       <i class="bi bi-arrow-counterclockwise"></i>
                     </button>
                     <button @click="openPermanentDeleteModal(emp.id, emp.nom)"
-                      class="btn btn-sm btn-outline-danger rounded-3" title="Supprimer définitivement">
+                      class="btn btn-sm btn-icon btn-outline-danger rounded-3" title="Supprimer définitivement">
                       <i class="bi bi-trash"></i>
                     </button>
                   </template>
@@ -394,7 +406,10 @@ export default {
     messageClass() { return this.messageType === 'success' ? 'alert-success' : 'alert-danger'; },
     messageIcon()  { return this.messageType === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'; },
     editMessageClass() { return this.editMessageType === 'success' ? 'text-success' : 'text-danger'; },
-    editMessageIcon()  { return this.editMessageType === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'; }
+    editMessageIcon()  { return this.editMessageType === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'; },
+    payesCount()    { return this.employes.filter(e => e.statut_paiement === 'Payé').length; },
+    aPayerCount()   { return this.employes.filter(e => e.statut_paiement !== 'Payé' && this.peutEtrePaye(e)).length; },
+    enCoursCount()  { return this.employes.filter(e => e.statut_paiement !== 'Payé' && !this.peutEtrePaye(e)).length; }
   },
 
   mounted() {
@@ -425,6 +440,31 @@ export default {
 
   methods: {
 
+    initials(nom) {
+      if (!nom) return '?';
+      return nom.trim().split(/\s+/).slice(0, 2).map(w => w.charAt(0).toUpperCase()).join('');
+    },
+
+    formatMontant(n) {
+      const value = Number(n || 0);
+      return value.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    },
+
+    statutKey(emp) {
+      if (emp.statut_paiement === 'Payé') return 'statut-paye';
+      return this.peutEtrePaye(emp) ? 'statut-apayer' : 'statut-encours';
+    },
+
+    statutLabel(emp) {
+      if (emp.statut_paiement === 'Payé') return 'Payé';
+      return this.peutEtrePaye(emp) ? 'À payer' : 'En cours';
+    },
+
+    statutIcon(emp) {
+      if (emp.statut_paiement === 'Payé') return 'bi-check-circle-fill';
+      return this.peutEtrePaye(emp) ? 'bi-exclamation-circle-fill' : 'bi-clock-fill';
+    },
+
     // ════════════════════════════════
     //  LOGIQUE JOURS / PAIEMENT
     // ════════════════════════════════
@@ -445,38 +485,6 @@ export default {
     peutEtrePaye(emp) {
       if (emp.statut_paiement === 'Payé') return false;
       return this.joursReels(emp) >= Number(emp.nb_jours);
-    },
-
-    // ════════════════════════════════
-    //  SUIVI / BADGE
-    // ════════════════════════════════
-
-    suiviLabel(emp) {
-      if (emp.statut_paiement === 'Payé') return '✅ Payé';
-      const reels = this.joursReels(emp);
-      const contrat = Number(emp.nb_jours);
-      if (reels >= contrat) return '🔴 Paiement dû';
-      const restant = contrat - reels;
-      if (restant <= 3) return `⚠️ ${restant}j restant${restant > 1 ? 's' : ''}`;
-      return `📅 ${reels}j / ${contrat}j`;
-    },
-
-    suiviBadgeClass(emp) {
-      if (emp.statut_paiement === 'Payé') return 'badge-suivi-paye';
-      const reels = this.joursReels(emp);
-      const contrat = Number(emp.nb_jours);
-      if (reels >= contrat) return 'badge-suivi-du';
-      if (contrat - reels <= 3) return 'badge-suivi-proche';
-      return 'badge-suivi-encours';
-    },
-
-    rowClass(emp) {
-      if (this.isArchived) return '';
-      if (emp.statut_paiement === 'Payé') return '';
-      if (this.peutEtrePaye(emp)) return 'table-danger';
-      const restant = Number(emp.nb_jours) - this.joursReels(emp);
-      if (restant <= 3) return 'table-warning';
-      return '';
     },
 
     // ════════════════════════════════
@@ -551,9 +559,24 @@ export default {
       }
     },
 
+    parseDBDate(dateString) {
+      if (dateString instanceof Date) return dateString;
+      const str = String(dateString);
+      const full = str.match(/^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})/);
+      if (full) return new Date(+full[1], +full[2] - 1, +full[3], +full[4], +full[5]);
+      const day = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (day) return new Date(+day[1], +day[2] - 1, +day[3]);
+      return new Date(str);
+    },
+
+    formatDateDay(dateString) {
+      if (!dateString) return '-';
+      return this.parseDBDate(dateString).toLocaleDateString('fr-FR');
+    },
+
     formatDate(dateString) {
       if (!dateString) return '-';
-      return new Date(dateString).toLocaleDateString('fr-FR', {
+      return this.parseDBDate(dateString).toLocaleDateString('fr-FR', {
         day: '2-digit', month: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit'
       });
@@ -561,7 +584,7 @@ export default {
 
     formatDateShort(dateString) {
       if (!dateString) return '-';
-      return new Date(dateString).toLocaleDateString('fr-FR', {
+      return this.parseDBDate(dateString).toLocaleDateString('fr-FR', {
         day: '2-digit', month: '2-digit', year: 'numeric'
       });
     },
@@ -692,18 +715,53 @@ export default {
 </script>
 
 <style scoped>
-/* ── Gradient header ── */
-.bg-gradient-primary-to-secondary {
+/* ── En-tête dégradé ── */
+.list-header {
+  position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 32px 40px;
+  overflow: hidden;
 }
 
-/* ── Icônes ── */
+.header-blob {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.10);
+  pointer-events: none;
+}
+.blob-1 { width: 180px; height: 180px; top: -80px; right: -40px; }
+.blob-2 { width: 100px; height: 100px; bottom: -50px; left: 60px; background: rgba(255, 255, 255, 0.07); }
+
 .icon-circle {
   width: 48px; height: 48px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
   background: rgba(255,255,255,0.2);
 }
+
+/* ── Mini-statistiques ── */
+.mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.74rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+.mini-stat i { font-size: 0.9rem; }
+.mini-stat strong { font-weight: 800; }
+.mini-stat-total   { background: rgba(255,255,255,0.15); }
+.mini-stat-payes   { background: rgba(34,197,94,0.30); border-color: rgba(34,197,94,0.4); }
+.mini-stat-attente { background: rgba(239,68,68,0.30); border-color: rgba(239,68,68,0.4); }
+.mini-stat-cours   { background: rgba(245,158,11,0.30); border-color: rgba(245,158,11,0.4); }
+
+/* ── Icônes ── */
 .icon-circle-sm {
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
@@ -721,28 +779,85 @@ export default {
 .bg-danger-10  { background: rgba(220,53,69,0.1); }
 .bg-warning-10 { background: rgba(255,193,7,0.1); }
 
+/* ── Avatar initiales ── */
 .avatar-circle {
-  width: 36px; height: 36px;
+  width: 38px; height: 38px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.30);
 }
 
-/* ── Badges de suivi ── */
-.badge-suivi {
-  font-size: 0.65rem;
+/* ── Numéro employé ── */
+.emp-num {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 10px;
-  letter-spacing: 0.03em;
+  font-size: 0.82rem;
+  color: #6b7280;
+  background: #f3f4fa;
+  border-radius: 8px;
+  padding: 3px 9px;
+  white-space: nowrap;
 }
-.badge-suivi-paye    { background: #d1fae5; color: #065f46; }
-.badge-suivi-du      { background: #fee2e2; color: #991b1b; animation: pulse-red 1.2s infinite; }
-.badge-suivi-proche  { background: #fef3c7; color: #92400e; }
-.badge-suivi-encours { background: #e0e7ff; color: #3730a3; }
 
-@keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(220,53,69,0.4); }
-  50%       { box-shadow: 0 0 0 5px rgba(220,53,69,0); }
+/* ── Progression ── */
+.progress-slim {
+  height: 6px;
+  border-radius: 999px;
+  background: #eef0f8;
+  min-width: 90px;
+}
+.progress-slim .progress-bar {
+  border-radius: 999px;
+  background-image: linear-gradient(135deg, #667eea, #764ba2);
+}
+.progress-slim .progress-bar.bg-success {
+  background-image: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+/* ── Salaire ── */
+.salaire-text {
+  font-weight: 700;
+  color: #4338ca;
+  white-space: nowrap;
+}
+
+/* ── Statut (pastilles douces) ── */
+.statut-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.statut-paye    { background: #e7f6ee; color: #15803d; }
+.statut-apayer  { background: #fdecec; color: #dc2626; }
+.statut-encours { background: #edf0fb; color: #4f46e5; }
+
+/* ── Boutons d'action ── */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.btn-neutral {
+  color: #6b7280;
+  background: #f3f4fa;
+  border: 1px solid #e6e8f2;
+}
+.btn-neutral:hover {
+  color: #4f46e5;
+  background: #eef0fb;
+  border-color: rgba(102, 126, 234, 0.4);
 }
 
 /* ── Bouton payer ── */
@@ -757,7 +872,7 @@ export default {
 /* ── NOTIFICATIONS ── */
 .notif-stack {
   position: fixed;
-  top: 20px;
+  top: 76px;
   right: 20px;
   z-index: 9999;
   display: flex;
@@ -861,9 +976,20 @@ export default {
 }
 
 /* ── Tableau ── */
-.table-hover tbody tr:hover {
-  background: rgba(13,110,253,0.03);
+.table { --bs-table-striped-bg: rgba(102, 126, 234, 0.035); }
+
+.table th, .table td {
+  padding: 1.1rem 1.15rem;
 }
-.table-warning { background-color: #fff3cd !important; }
-.table-danger  { background-color: #ffe0e0 !important; }
+
+.table td {
+  font-size: 0.95rem;
+}
+
+.table th:nth-child(9), .table td:nth-child(9) { min-width: 115px; }
+.table th:nth-child(10), .table td:nth-child(10) { min-width: 155px; white-space: nowrap; }
+
+.table-hover tbody tr:hover {
+  background: rgba(102, 126, 234, 0.05);
+}
 </style>

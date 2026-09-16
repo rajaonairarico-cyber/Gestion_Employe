@@ -3,10 +3,12 @@
     <div class="row justify-content-center">
       <div class="col-lg-8 col-xl-7">
         <!-- Carte principale avec animation -->
-        <div class="card border-0 shadow-2xl rounded-5 overflow-hidden animate__animated animate__fadeInUp">
-          <!-- En-tête avec dégradé -->
-          <div class="card-header bg-gradient-primary-to-secondary text-white border-0 py-4">
-            <div class="d-flex align-items-center">
+        <div class="add-card animate__animated animate__fadeInUp">
+          <!-- En-tête avec dégradé + décoration -->
+          <div class="add-header">
+            <div class="header-blob blob-1"></div>
+            <div class="header-blob blob-2"></div>
+            <div class="d-flex align-items-center position-relative">
               <div class="icon-circle bg-white-20 me-3">
                 <i class="bi bi-person-plus-fill fs-3"></i>
               </div>
@@ -25,15 +27,15 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="numEmp" class="form-label fw-semibold text-muted small text-uppercase tracking-wide">
-                      <i class="bi bi-hash me-2 text-primary"></i>Numéro employé
+                      <i class="bi bi-hash me-2 primary-accent"></i>Numéro employé
                     </label>
                     <div class="input-group has-validation">
-                      <input 
-                        v-model="numEmp" 
-                        type="text" 
-                        class="form-control rounded-4 border-2 p-3" 
+                      <input
+                        v-model="numEmp"
+                        type="text"
+                        class="form-control rounded-4 border-2 p-3"
                         id="numEmp"
-                        placeholder="Ex: E003" 
+                        placeholder="Ex: E003"
                         required
                         :class="{ 'is-invalid': errorNumEmp }"
                         @input="errorNumEmp = false"
@@ -53,14 +55,14 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="nom" class="form-label fw-semibold text-muted small text-uppercase tracking-wide">
-                      <i class="bi bi-person me-2 text-primary"></i>Nom
+                      <i class="bi bi-person me-2 primary-accent"></i>Nom
                     </label>
-                    <input 
-                      v-model="nom" 
-                      type="text" 
-                      class="form-control rounded-4 border-2 p-3" 
+                    <input
+                      v-model="nom"
+                      type="text"
+                      class="form-control rounded-4 border-2 p-3"
                       id="nom"
-                      placeholder="Nom complet" 
+                      placeholder="Nom complet"
                       required
                     >
                   </div>
@@ -72,11 +74,11 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="emploi" class="form-label fw-semibold text-muted small text-uppercase tracking-wide">
-                      <i class="bi bi-briefcase me-2 text-primary"></i>Emploi
+                      <i class="bi bi-briefcase me-2 primary-accent"></i>Emploi
                     </label>
-                    <select 
-                      v-model="emploi" 
-                      class="form-select rounded-4 border-2 p-3" 
+                    <select
+                      v-model="emploi"
+                      class="form-select rounded-4 border-2 p-3"
                       id="emploi"
                       required
                       @change="updateTauxJournalier"
@@ -92,14 +94,14 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="nbJours" class="form-label fw-semibold text-muted small text-uppercase tracking-wide">
-                      <i class="bi bi-calendar3 me-2 text-primary"></i>Nombre de jours
+                      <i class="bi bi-calendar3 me-2 primary-accent"></i>Nombre de jours
                     </label>
-                    <input 
-                      v-model="nb_jours" 
-                      type="number" 
-                      class="form-control rounded-4 border-2 p-3" 
+                    <input
+                      v-model="nb_jours"
+                      type="number"
+                      class="form-control rounded-4 border-2 p-3"
                       id="nbJours"
-                      placeholder="Ex: 22" 
+                      placeholder="Ex: 22"
                       required
                     >
                   </div>
@@ -111,15 +113,15 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <label for="taux" class="form-label fw-semibold text-muted small text-uppercase tracking-wide">
-                      <i class="bi bi-currency-exchange me-2 text-primary"></i>Taux journalier (Ar)
+                      <i class="bi bi-currency-exchange me-2 primary-accent"></i>Taux journalier (Ar)
                     </label>
-                    <input 
-                      v-model="taux_journalier" 
-                      type="number" 
-                      step="0.01" 
-                      class="form-control rounded-4 border-2 p-3 bg-light" 
+                    <input
+                      v-model="taux_journalier"
+                      type="number"
+                      step="0.01"
+                      class="form-control rounded-4 border-2 p-3 bg-light"
                       id="taux"
-                      placeholder="Auto" 
+                      placeholder="Auto"
                       required
                       readonly
                     >
@@ -129,8 +131,8 @@
 
               <!-- Bouton principal -->
               <div class="mt-5">
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-sm hover-shadow-lg transition-all position-relative overflow-hidden"
                   :disabled="isLoading"
                 >
@@ -293,12 +295,32 @@ export default {
 </script>
 
 <style scoped>
-/* Dégradé personnalisé */
-.bg-gradient-primary-to-secondary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* ── Carte principale ── */
+.add-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
-/* Cercle d'icône dans l'en-tête */
+/* ── En-tête dégradé ── */
+.add-header {
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 32px 40px;
+  overflow: hidden;
+}
+
+.header-blob {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.10);
+  pointer-events: none;
+}
+.blob-1 { width: 160px; height: 160px; top: -70px; right: -30px; }
+.blob-2 { width: 90px; height: 90px; bottom: -40px; left: 40px; background: rgba(255, 255, 255, 0.07); }
+
 .icon-circle {
   width: 48px;
   height: 48px;
@@ -309,7 +331,7 @@ export default {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Grand cercle d'icône dans la modal */
+/* ── Grand cercle d'icône dans la modal ── */
 .icon-circle-large {
   width: 80px;
   height: 80px;
@@ -320,11 +342,13 @@ export default {
   margin: 0 auto;
 }
 
-.bg-danger-10 {
-  background: rgba(220, 53, 69, 0.1);
-}
+.bg-danger-10 { background: rgba(220, 53, 69, 0.1); }
+.bg-white-20 { background: rgba(255, 255, 255, 0.2); }
 
-/* Animation pour les messages */
+/* ── Accents ── */
+.primary-accent { color: #667eea; }
+
+/* ── Animation pour les messages ── */
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: all 0.3s ease;
@@ -335,47 +359,22 @@ export default {
   opacity: 0;
 }
 
-/* Formulaire flottant - style Bootstrap modernisé */
-.form-control:focus, .form-select:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
-}
-
-.form-control.is-invalid:focus {
-  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-}
-
-/* Bouton moderne */
-.btn-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border: none;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #5a6fe0, #6a429b);
-  transform: translateY(-2px);
-}
-
+/* ── Bouton doux ── */
 .btn-soft-primary {
   background: rgba(102, 126, 234, 0.1);
   color: #667eea;
   border: 1px solid rgba(102, 126, 234, 0.2);
 }
-
 .btn-soft-primary:hover {
   background: rgba(102, 126, 234, 0.2);
 }
 
-/* Typographie */
+/* ── Typographie ── */
 .tracking-wide {
   letter-spacing: 0.05em;
 }
 
-/* Ombre améliorée */
-.shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
+/* ── Ombre améliorée ── */
 .hover-shadow-lg:hover {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
