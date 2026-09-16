@@ -1,4 +1,9 @@
 <?php
+/**
+ * Connexion à la base de données
+ * Compatible local (MySQL) et Render (PostgreSQL)
+ */
+
 $driver   = getenv('DB_DRIVER')   ?: 'mysql';
 $host     = getenv('DB_HOST')     ?: 'localhost';
 $db_name  = getenv('DB_NAME')     ?: 'gestion_employe';
@@ -8,13 +13,22 @@ $password = getenv('DB_PASSWORD') ?: 'bakay@@2005';
 try {
     if ($driver === 'pgsql') {
         $port = getenv('DB_PORT') ?: '5432';
-        $conn = new PDO("pgsql:host=$host;port=$port;dbname=$db_name", $username, $password);
+        $conn = new PDO(
+            "pgsql:host=$host;port=$port;dbname=$db_name",
+            $username,
+            $password
+        );
     } else {
-        $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8mb4", $username, $password);
+        $conn = new PDO(
+            "mysql:host=$host;dbname=$db_name;charset=utf8mb4",
+            $username,
+            $password
+        );
     }
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-    // Auto-create table if missing (safe: IF NOT EXISTS)
+    // Créer la table si elle n'existe pas
     if ($driver === 'pgsql') {
         $conn->exec('CREATE TABLE IF NOT EXISTS employe (
             id SERIAL PRIMARY KEY,
@@ -29,7 +43,7 @@ try {
             date_suppression TIMESTAMP NULL
         )');
     } else {
-        $conn->exec('CREATE TABLE IF NOT EXISTS employe (
+        $conn->exec("CREATE TABLE IF NOT EXISTS employe (
             id INT AUTO_INCREMENT PRIMARY KEY,
             numEmp VARCHAR(20) NOT NULL,
             nom VARCHAR(255) NOT NULL,
@@ -38,12 +52,13 @@ try {
             taux_journalier DECIMAL(12,2) NOT NULL,
             date_ajout DATETIME,
             date_fin_contrat DATE,
-            statut_paiement VARCHAR(20) DEFAULT "Non payé",
+            statut_paiement VARCHAR(20) DEFAULT 'Non payé',
             date_suppression DATETIME NULL
-        )');
+        )");
     }
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     http_response_code(500);
+    header('Content-Type: application/json');
     echo json_encode(["message" => "Erreur de connexion à la base de données"]);
     exit;
 }

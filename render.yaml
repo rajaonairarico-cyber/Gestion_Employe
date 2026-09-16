@@ -48,7 +48,6 @@ services:
     name: gestion-employe-frontend
     runtime: static                # ← runtime "static"
     plan: free
-    region: frankfurt
     rootDir: frontend/Gestion-Employe
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
