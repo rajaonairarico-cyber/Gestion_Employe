@@ -12,7 +12,15 @@ $password = getenv('DB_PASSWORD') ?: 'bakay@@2005';
 
 try {
     if ($driver === 'pgsql') {
-        $port = getenv('DB_PORT') ?: '5432';
+        $url = getenv('DATABASE_URL');
+        if ($url) {
+            $p        = parse_url($url);
+            $host     = $p['host'] ?? $host;
+            $port     = $p['port'] ?? 5432;
+            $db_name  = ltrim(($p['path'] ?? ''), '/') ?: $db_name;
+            $username = $p['user'] ?? $username;
+            $password = isset($p['pass']) ? urldecode($p['pass']) : $password;
+        }
         $conn = new PDO(
             "pgsql:host=$host;port=$port;dbname=$db_name;sslmode=require",
             $username,
