@@ -47,7 +47,6 @@ services:
   - type: web                      # ← "web" (et non "static")
     name: gestion-employe-frontend
     runtime: static                # ← runtime "static"
-    plan: free
     rootDir: frontend/Gestion-Employe
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
