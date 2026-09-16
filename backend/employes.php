@@ -52,7 +52,7 @@ switch($method) {
 
         // 2. Paiement : passer le statut à "Payé" si la date de fin est dépassée
         if (isset($_GET['pay'])) {
-            $stmt = $conn->prepare("UPDATE employe SET statut_paiement = 'Payé' WHERE id = ? AND date_fin_contrat <= CURDATE()");
+            $stmt = $conn->prepare("UPDATE employe SET statut_paiement = 'Payé' WHERE id = ? AND date_fin_contrat <= CURRENT_DATE");
             $stmt->execute([$data->id]);
             $rowCount = $stmt->rowCount();
             if ($rowCount > 0) {
@@ -158,7 +158,7 @@ switch($method) {
             echo json_encode(["message" => "Suppression définitive réussie"]);
         } else {
             // Archivage (marque la date de suppression)
-            $stmt = $conn->prepare("UPDATE employe SET date_suppression = NOW() WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE employe SET date_suppression = CURRENT_TIMESTAMP WHERE id = ?");
             $stmt->execute([$data->id]);
             echo json_encode(["message" => "Employé archivé avec succès"]);
         }

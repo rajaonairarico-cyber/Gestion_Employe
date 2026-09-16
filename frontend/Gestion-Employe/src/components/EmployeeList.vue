@@ -359,6 +359,7 @@
 <script>
 import axios from 'axios';
 import { Modal } from 'bootstrap';
+import API_BASE from '../config';
 
 export default {
   data() {
@@ -543,8 +544,8 @@ export default {
     async fetchEmployes() {
       try {
         const url = this.isArchived
-          ? 'http://localhost/projet_employe/backend/employes.php?archived=true'
-          : 'http://localhost/projet_employe/backend/employes.php';
+          ? `${API_BASE}/employes.php?archived=true`
+          : `${API_BASE}/employes.php`;
         const response = await axios.get(url);
         this.employes = response.data;
         this.message = '';
@@ -612,7 +613,7 @@ export default {
 
     async updateEmployee() {
       try {
-        const response = await axios.put('http://localhost/projet_employe/backend/employes.php', this.editForm);
+        const response = await axios.put(`${API_BASE}/employes.php`, this.editForm);
         this.editMessage = response.data.message || 'Modification réussie !';
         this.editMessageType = 'success';
         this.editing = false;
@@ -632,7 +633,7 @@ export default {
     async payEmployee(emp) {
       try {
         const response = await axios.post(
-          'http://localhost/projet_employe/backend/employes.php?pay=true',
+          `${API_BASE}/employes.php?pay=true`,
           { id: emp.id }
         );
         this.message = response.data.message || 'Paiement effectué avec succès !';
@@ -660,7 +661,7 @@ export default {
     async confirmArchive() {
       if (!this.archiveId) return;
       try {
-        const response = await axios.delete('http://localhost/projet_employe/backend/employes.php', {
+        const response = await axios.delete(`${API_BASE}/employes.php`, {
           data: { id: this.archiveId }
         });
         this.message = response.data.message || 'Employé archivé avec succès.';
@@ -677,7 +678,7 @@ export default {
 
     async restoreEmployee(id) {
       try {
-        const response = await axios.post('http://localhost/projet_employe/backend/employes.php?restore=true', { id });
+        const response = await axios.post(`${API_BASE}/employes.php?restore=true`, { id });
         this.message = response.data.message || 'Employé restauré avec succès.';
         this.messageType = 'success';
         await this.fetchEmployes();
@@ -696,7 +697,7 @@ export default {
     async confirmPermanentDelete() {
       if (!this.permanentDeleteId) return;
       try {
-        const response = await axios.delete('http://localhost/projet_employe/backend/employes.php?permanent=true', {
+        const response = await axios.delete(`${API_BASE}/employes.php?permanent=true`, {
           data: { id: this.permanentDeleteId }
         });
         this.message = response.data.message || 'Employé supprimé définitivement.';

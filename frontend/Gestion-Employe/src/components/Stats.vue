@@ -81,6 +81,7 @@
 <script>
 import axios from 'axios';
 import { Chart, registerables } from 'chart.js';
+import API_BASE from '../config';
 Chart.register(...registerables);
 
 export default {
@@ -105,7 +106,7 @@ export default {
   methods: {
     async fetchStats() {
       try {
-        const response = await axios.get('http://localhost/projet_employe/backend/stats.php');
+        const response = await axios.get(`${API_BASE}/stats.php`);
         this.total = parseFloat(response.data.total || 0).toFixed(2);
         this.min = parseFloat(response.data.min || 0).toFixed(2);
         this.max = parseFloat(response.data.max || 0).toFixed(2);

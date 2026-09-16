@@ -97,6 +97,8 @@
 </template>
 
 <script>
+import API_BASE from '../config'
+
 export default {
   data() {
     return {
@@ -136,7 +138,7 @@ export default {
       this.loginError = false;
       this.message = '';
       try {
-        const response = await fetch('http://localhost/projet_employe/backend/login.php', {
+        const response = await fetch(`${API_BASE}/login.php`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: this.username, password: this.password })

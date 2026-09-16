@@ -192,6 +192,7 @@
 <script>
 import axios from 'axios';
 import { Modal } from 'bootstrap';
+import API_BASE from '../config';
 
 export default {
   data() {
@@ -228,7 +229,7 @@ export default {
   methods: {
     async suggestNextNum() {
       try {
-        const response = await axios.get('http://localhost/projet_employe/backend/employes.php');
+        const response = await axios.get(`${API_BASE}/employes.php`);
         const employes = response.data;
         const nums = employes
           .map(emp => {
@@ -252,7 +253,7 @@ export default {
       this.message = '';
 
       try {
-        const checkResponse = await axios.get(`http://localhost/projet_employe/backend/employes.php?numEmp=${this.numEmp}`);
+        const checkResponse = await axios.get(`${API_BASE}/employes.php?numEmp=${this.numEmp}`);
         if (checkResponse.data.exists) {
           this.errorNumEmp = true;
           const modalElement = document.getElementById('errorModal');
@@ -265,7 +266,7 @@ export default {
         const now = new Date();
         const dateStr = now.toISOString().slice(0, 19).replace('T', ' ');
 
-        await axios.post('http://localhost/projet_employe/backend/employes.php', {
+        await axios.post(`${API_BASE}/employes.php`, {
           numEmp: this.numEmp,
           nom: this.nom,
           emploi: this.emploi,

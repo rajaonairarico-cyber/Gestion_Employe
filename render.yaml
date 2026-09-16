@@ -1,0 +1,52 @@
+# ═══════════════════════════════════════════════════════════
+#  Gestion_Employe — Blueprint Render (déploiement en un clic)
+#  Rend déployé : Static Site (frontend) + Web Service Docker (API) + PostgreSQL
+# ═══════════════════════════════════════════════════════════
+
+databases:
+  - name: gestion-employe-db
+    plan: free
+    databaseName: gestion_employe
+    ipAllowList: []
+
+services:
+  # ── 1. API PHP (Web Service + Docker) ─────────────────────
+  - type: web
+    name: gestion-employe-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /test.php
+    envVars:
+      - key: DB_DRIVER
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: gestion-employe-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: gestion-employe-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: gestion-employe-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: gestion-employe-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: gestion-employe-db
+          property: password
+
+  # ── 2. Frontend Vue (Static Site) ─────────────────────────
+  - type: static
+    name: gestion-employe-frontend
+    runtime: static
+    buildCommand: cd frontend/Gestion-Employe && npm install && npm run build
+    staticPublishPath: ./frontend/Gestion-Employe/dist
+    envVars:
+      - key: VUE_APP_API_URL
+        value: https://gestion-employe-api.onrender.com
