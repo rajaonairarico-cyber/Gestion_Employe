@@ -6,6 +6,7 @@
 databases:
   - name: gestion-employe-db
     plan: free
+    region: frankfurt
     databaseName: gestion_employe
     ipAllowList: []
 
@@ -52,4 +53,4 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VUE_APP_API_URL
-        value: https://gestion-employe-api-6mhx.onrender.com
+        value: https://gestion-employe-api.onrender.com
