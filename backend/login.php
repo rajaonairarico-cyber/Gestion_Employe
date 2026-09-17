@@ -17,10 +17,16 @@ if ($data === null) {
     exit;
 }
 
-// Vérifier les identifiants admin/admin
-if ($data->username == 'rajaonaira' && $data->password == 'bakay@@2005') {
+// Vérifier les identifiants (insensible à la casse + espaces ignorés)
+$receivedUser = isset($data->username) ? trim((string) $data->username) : '';
+$receivedPass = isset($data->password) ? trim((string) $data->password) : '';
+
+if (strcasecmp($receivedUser, 'rajaonaira') === 0 && $receivedPass === 'bakay@@2005') {
     echo json_encode(["message" => "Connexion réussie", "token" => "123456"]);
 } else {
-    echo json_encode(["message" => "Échec de la connexion", "received" => $data]);
+    echo json_encode([
+        "message" => "Échec de la connexion",
+        "received" => ["username" => $receivedUser, "password" => $receivedPass]
+    ]);
 }
 ?>
