@@ -7,7 +7,6 @@ databases:
   - name: gestion-employe-db
     plan: free
     databaseName: gestion_employe
-    ipAllowList: []
 
 services:
   # ── 1. API PHP (Web Service + Docker) ─────────────────────
